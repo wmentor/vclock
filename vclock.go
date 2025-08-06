@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"encoding/json"
+	"sort"
 )
 
-type VClock map[uint64]uint64
+type VClock map[string]uint64
 
 type CompareResult = int
 
@@ -19,7 +20,7 @@ const (
 )
 
 func New() VClock {
-	return map[uint64]uint64{}
+	return map[string]uint64{}
 }
 
 func FromRaw(str string) (VClock, error) {
@@ -69,11 +70,11 @@ func (vc VClock) Merge(other VClock) {
 	}
 }
 
-func (vc VClock) Tick(key uint64) {
+func (vc VClock) Tick(key string) {
 	vc[key]++
 }
 
-func (vc VClock) Set(key, value uint64) {
+func (vc VClock) Set(key string, value uint64) {
 	vc[key] = value
 }
 
@@ -113,5 +114,26 @@ func (vc VClock) Compare(other VClock) CompareResult {
 		}
 	}
 
+	return ret
+}
+
+func (vc VClock) PassiveInc(before, now VClock) {
+	for k, v := range now {
+		if old, ok := before[k]; ok && old == v {
+			vc[k]++
+		} else {
+			vc[k] = 1
+		}
+	}
+}
+
+func (vc VClock) More(threshold uint64) []string {
+	ret := make([]string, 0)
+	for k, v := range vc {
+		if v > threshold {
+			ret = append(ret, k)
+		}
+	}
+	sort.Strings(ret)
 	return ret
 }
