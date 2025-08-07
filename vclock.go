@@ -137,3 +137,23 @@ func (vc VClock) More(threshold uint64) []string {
 	sort.Strings(ret)
 	return ret
 }
+
+func (vc VClock) Less(threshold uint64) []string {
+	ret := make([]string, 0)
+	for k, v := range vc {
+		if v < threshold {
+			ret = append(ret, k)
+		}
+	}
+	sort.Strings(ret)
+	return ret
+}
+
+func (vc VClock) IDs() []string {
+	ret := make([]string, 0, len(vc))
+	for k := range vc {
+		ret = append(ret, k)
+	}
+	sort.Strings(ret)
+	return ret
+}

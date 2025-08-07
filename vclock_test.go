@@ -182,7 +182,7 @@ func TestMore(t *testing.T) {
 	vc.Tick("2")
 	vc.Tick("3")
 
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		vc.Tick("1")
 		if i%2 == 0 {
 			vc.Tick("2")
@@ -196,4 +196,6 @@ func TestMore(t *testing.T) {
 	require.Equal(t, []string{"1"}, vc.More(30))
 	require.Equal(t, []string{"1", "2"}, vc.More(15))
 	require.Equal(t, []string{"1", "2", "3"}, vc.More(10))
+	require.Equal(t, []string{"2", "3"}, vc.Less(25))
+	require.Equal(t, []string{"1", "2", "3"}, vc.IDs())
 }
